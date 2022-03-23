@@ -169,35 +169,35 @@ def stop_NoteContainer(nc, channel=1):
     return midi.stop_NoteContainer(nc, channel)
 
 
-def play_Bar(bar, channel=1, bpm=120):
+def play_Bar(bar, channel=1, bpm=120, velocity=100):
     """Play a Bar object using play_NoteContainer and stop_NoteContainer.
 
     Set a bpm attribute on a NoteContainer to change the tempo.
     """
-    return midi.play_Bar(bar, channel, bpm)
+    return midi.play_Bar(bar, channel, bpm, velocity)
 
 
-def play_Bars(bars, channels, bpm=120):
+def play_Bars(bars, channels, bpm=120, velocity=120):
     """Play a list of bars on the given list of channels.
 
     Set a bpm attribute on a NoteContainer to change the tempo.
     """
-    return midi.play_Bars(bars, channels, bpm)
+    return midi.play_Bars(bars, channels, bpm, velocity)
 
 
-def play_Track(track, channel=1, bpm=120):
+def play_Track(track, channel=1, bpm=120, velocity=100):
     """Use play_Bar to play a Track object."""
-    return midi.play_Track(track, channel, bpm)
+    return midi.play_Track(track, channel, bpm, velocity)
 
 
-def play_Tracks(tracks, channels, bpm=120):
+def play_Tracks(tracks, channels, bpm=120, velocity=100):
     """Use play_Bars to play a list of Tracks on the given list of channels."""
-    return midi.play_Tracks(tracks, channels, bpm)
+    return midi.play_Tracks(tracks, channels, bpm, velocity)
 
 
-def play_Composition(composition, channels=None, bpm=120):
+def play_Composition(composition, channels=None, bpm=120, velocity=100):
     """Play a composition."""
-    return midi.play_Composition(composition, channels, bpm)
+    return midi.play_Composition(composition, channels, bpm, velocity)
 
 
 def control_change(channel, control, value):

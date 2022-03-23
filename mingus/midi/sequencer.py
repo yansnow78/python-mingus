@@ -38,7 +38,7 @@ class Sequencer(object):
 
     You can use the Sequencer object either by creating a subclass and
     implementing some of the events (init, play_event, stop_event, cc_event,
-    instr_event) or by attaching observer objects via 'attach' and catching
+    instr_event) or by attaching observer objects via 'attach' and catching 
     the messages in the notify(msg_type, param_dict) function of your object.
 
     See SequencerObserver for a pre made, easy to extend base class that can
@@ -167,8 +167,12 @@ class Sequencer(object):
         if hasattr(note, "channel"):
             channel = note.channel
         self.stop_event(int(note) + 12, int(channel))
-        self.notify_listeners(self.MSG_STOP_INT, {"channel": int(channel), "note": int(note) + 12})
-        self.notify_listeners(self.MSG_STOP_NOTE, {"channel": int(channel), "note": note})
+        self.notify_listeners(
+            self.MSG_STOP_INT, {"channel": int(channel), "note": int(note) + 12}
+        )
+        self.notify_listeners(
+            self.MSG_STOP_NOTE, {"channel": int(channel), "note": note}
+        )
         return True
 
     def stop_everything(self):
@@ -199,7 +203,7 @@ class Sequencer(object):
                 return False
         return True
 
-    def play_Bar(self, bar, channel=1, bpm=120):
+    def play_Bar(self, bar, channel=1, bpm=120, velocity=100):
         """Play a Bar object.
 
         Return a dictionary with the bpm lemma set on success, an empty dict
@@ -208,12 +212,14 @@ class Sequencer(object):
         The tempo can be changed by setting the bpm attribute on a
         NoteContainer.
         """
-        self.notify_listeners(self.MSG_PLAY_BAR, {"bar": bar, "channel": channel, "bpm": bpm})
+        self.notify_listeners(
+            self.MSG_PLAY_BAR, {"bar": bar, "channel": channel, "bpm": bpm}
+        )
 
         # length of a quarter note
         qn_length = 60.0 / bpm
         for nc in bar:
-            if not self.play_NoteContainer(nc[2], channel, 100):
+            if not self.play_NoteContainer(nc[2], channel, velocity):
                 return {}
 
             # Change the quarter note length if the NoteContainer has a bpm
@@ -227,13 +233,15 @@ class Sequencer(object):
             self.stop_NoteContainer(nc[2], channel)
         return {"bpm": bpm}
 
-    def play_Bars(self, bars, channels, bpm=120):
+    def play_Bars(self, bars, channels, bpm=120, velocity=100):
         """Play several bars (a list of Bar objects) at the same time.
 
         A list of channels should also be provided. The tempo can be changed
         by providing one or more of the NoteContainers with a bpm argument.
         """
-        self.notify_listeners(self.MSG_PLAY_BARS, {"bars": bars, "channels": channels, "bpm": bpm})
+        self.notify_listeners(
+            self.MSG_PLAY_BARS, {"bars": bars, "channels": channels, "bpm": bpm}
+        )
         qn_length = 60.0 / bpm  # length of a quarter note
         tick = 0.0  # place in beat from 0.0 to bar.length
         cur = [0] * len(bars)  # keeps the index of the NoteContainer under
@@ -248,7 +256,11 @@ class Sequencer(object):
             for (n, x) in enumerate(cur):
                 (start_tick, note_length, nc) = bars[n][x]
                 if start_tick <= tick:
-                    self.play_NoteContainer(nc, channels[n])
+                    if isinstance(velocity,int):
+                        velocity_n = velocity
+                    else:
+                        velocity_n = velocity[n]
+                    self.play_NoteContainer(nc, channels[n], velocity_n)
                     playing_new.append([note_length, n])
                     playing.append([note_length, nc, channels[n], n])
 
@@ -303,18 +315,20 @@ class Sequencer(object):
             playing.remove(p)
         return {"bpm": bpm}
 
-    def play_Track(self, track, channel=1, bpm=120):
+    def play_Track(self, track, channel=1, bpm=120, velocity=100):
         """Play a Track object."""
-        self.notify_listeners(self.MSG_PLAY_TRACK, {"track": track, "channel": channel, "bpm": bpm})
+        self.notify_listeners(
+            self.MSG_PLAY_TRACK, {"track": track, "channel": channel, "bpm": bpm}
+        )
         for bar in track:
-            res = self.play_Bar(bar, channel, bpm)
+            res = self.play_Bar(bar, channel, bpm, velocity)
             if res != {}:
                 bpm = res["bpm"]
             else:
                 return {}
         return {"bpm": bpm}
 
-    def play_Tracks(self, tracks, channels, bpm=120):
+    def play_Tracks(self, tracks, channels, bpm=120, velocity=100):
         """Play a list of Tracks.
 
         If an instance of MidiInstrument is used then the instrument will be
@@ -325,7 +339,9 @@ class Sequencer(object):
         )
 
         # Set the right instruments
+        max_bar = 0
         for x in range(len(tracks)):
+            max_bar = max(max_bar,len(tracks[0]))
             instr = tracks[x].instrument
             if isinstance(instr, MidiInstrument):
                 try:
@@ -333,17 +349,15 @@ class Sequencer(object):
                 except:
                     i = 1
                 self.set_instrument(channels[x], i)
-            else:
-                self.set_instrument(channels[x], 1)
         current_bar = 0
-        max_bar = len(tracks[0])
 
         # Play the bars
         while current_bar < max_bar:
             playbars = []
             for tr in tracks:
-                playbars.append(tr[current_bar])
-            res = self.play_Bars(playbars, channels, bpm)
+                if current_bar<len(tr):
+                    playbars.append(tr[current_bar])
+            res = self.play_Bars(playbars, channels, bpm, velocity)
             if res != {}:
                 bpm = res["bpm"]
             else:
@@ -351,7 +365,7 @@ class Sequencer(object):
             current_bar += 1
         return {"bpm": bpm}
 
-    def play_Composition(self, composition, channels=None, bpm=120):
+    def play_Composition(self, composition, channels=None, bpm=120, velocity=100):
         """Play a Composition object."""
         self.notify_listeners(
             self.MSG_PLAY_COMPOSITION,
@@ -359,7 +373,7 @@ class Sequencer(object):
         )
         if channels == None:
             channels = [x + 1 for x in range(len(composition.tracks))]
-        return self.play_Tracks(composition.tracks, channels, bpm)
+        return self.play_Tracks(composition.tracks, channels, bpm, velocity)
 
     def modulation(self, channel, value):
         """Set the modulation."""
