@@ -30,7 +30,7 @@ from __future__ import absolute_import
 
 from mingus.containers.instrument import MidiInstrument
 from six.moves import range
-
+import six
 
 class Sequencer(object):
 
@@ -38,7 +38,7 @@ class Sequencer(object):
 
     You can use the Sequencer object either by creating a subclass and
     implementing some of the events (init, play_event, stop_event, cc_event,
-    instr_event) or by attaching observer objects via 'attach' and catching 
+    instr_event) or by attaching observer objects via 'attach' and catching
     the messages in the notify(msg_type, param_dict) function of your object.
 
     See SequencerObserver for a pre made, easy to extend base class that can
@@ -110,10 +110,22 @@ class Sequencer(object):
 
     def set_instrument(self, channel, instr, bank=0):
         """Set the channel to the instrument _instr_."""
-        self.instr_event(channel, instr, bank)
+        if isinstance(instr, MidiInstrument):
+            try:
+                instr_i = instr.names.index(instr.name)
+            except ValueError:
+                instr_i = 1
+        elif isinstance(instr, six.string_types):
+            try:
+                instr_i = MidiInstrument.names.index(instr)
+            except ValueError:
+                instr_i = 1
+        else:
+            instr_i = instr
+        self.instr_event(channel, instr_i, bank)
         self.notify_listeners(
             self.MSG_INSTR,
-            {"channel": int(channel), "instr": int(instr), "bank": int(bank)},
+            {"channel": int(channel), "instr": int(instr_i), "bank": int(bank)},
         )
 
     def control_change(self, channel, control, value):
@@ -315,13 +327,14 @@ class Sequencer(object):
             playing.remove(p)
         return {"bpm": bpm}
 
-    def play_Track(self, track, channel=1, bpm=120, velocity=100):
+    def play_Track(self, track, channel=1, bpm=120):
         """Play a Track object."""
-        self.notify_listeners(
-            self.MSG_PLAY_TRACK, {"track": track, "channel": channel, "bpm": bpm}
-        )
+        self.notify_listeners(self.MSG_PLAY_TRACK, {"track": track, "channel": channel, "bpm": bpm})
+        instr = track.instrument
+        if instr is not None:
+            self.set_instrument(channel, instr)
         for bar in track:
-            res = self.play_Bar(bar, channel, bpm, velocity)
+            res = self.play_Bar(bar, channel, bpm)
             if res != {}:
                 bpm = res["bpm"]
             else:
@@ -343,13 +356,10 @@ class Sequencer(object):
         for x in range(len(tracks)):
             max_bar = max(max_bar,len(tracks[0]))
             instr = tracks[x].instrument
-            if isinstance(instr, MidiInstrument):
-                try:
-                    i = instr.names.index(instr.name)
-                except:
-                    i = 1
-                self.set_instrument(channels[x], i)
-        current_bar = 0
+            if instr is not None:
+                self.set_instrument(channels[x], instr)
+            current_bar = 0
+        max_bar = len(tracks[0])
 
         # Play the bars
         while current_bar < max_bar:
