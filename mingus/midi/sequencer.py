@@ -327,14 +327,14 @@ class Sequencer(object):
             playing.remove(p)
         return {"bpm": bpm}
 
-    def play_Track(self, track, channel=1, bpm=120):
+    def play_Track(self, track, channel=1, bpm=120, velocity=100):
         """Play a Track object."""
         self.notify_listeners(self.MSG_PLAY_TRACK, {"track": track, "channel": channel, "bpm": bpm})
         instr = track.instrument
         if instr is not None:
             self.set_instrument(channel, instr)
         for bar in track:
-            res = self.play_Bar(bar, channel, bpm)
+            res = self.play_Bar(bar, channel, bpm, velocity)
             if res != {}:
                 bpm = res["bpm"]
             else:
