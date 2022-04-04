@@ -28,9 +28,10 @@ attached to the Sequencer.
 """
 from __future__ import absolute_import
 
-from mingus.containers.instrument import MidiInstrument
+from mingus.containers.instrument import MidiInstrument, MidiInstr
 from six.moves import range
 import six
+
 
 class Sequencer(object):
 
@@ -110,22 +111,32 @@ class Sequencer(object):
 
     def set_instrument(self, channel, instr, bank=0):
         """Set the channel to the instrument _instr_."""
+        instr_name = ""
+        instr_i = 1
         if isinstance(instr, MidiInstrument):
-            try:
-                instr_i = instr.names.index(instr.name)
-            except ValueError:
-                instr_i = 1
+            instr_name = instr.name
+            instr_i = instr.instrument_nr
         elif isinstance(instr, six.string_types):
-            try:
-                instr_i = MidiInstrument.names.index(instr)
-            except ValueError:
-                instr_i = 1
-        else:
+            instr_name = instr
+        if instr_name:
+            if isinstance(instr_name, MidiInstr):
+                instr_i = instr_name.value
+            else:
+                try:
+                    instr_name = instr_name.replace(" ", "_")
+                    instr_name = instr_name.replace("(", "")
+                    instr_name = instr_name.replace(")", "")
+                    instr_name = instr_name.upper()
+                    instr_i = MidiInstr[instr_name].value
+                except ValueError:
+                    instr_i = 1
+        elif isinstance(instr, int):
             instr_i = instr
         self.instr_event(channel, instr_i, bank)
         self.notify_listeners(
             self.MSG_INSTR,
-            {"channel": int(channel), "instr": int(instr_i), "bank": int(bank)},
+            {"channel": int(channel), "instr": int(
+                instr_i), "bank": int(bank)},
         )
 
     def control_change(self, channel, control, value):
@@ -140,7 +151,8 @@ class Sequencer(object):
         self.cc_event(channel, control, value)
         self.notify_listeners(
             self.MSG_CC,
-            {"channel": int(channel), "control": int(control), "value": int(value)},
+            {"channel": int(channel), "control": int(
+                control), "value": int(value)},
         )
         return True
 
@@ -180,7 +192,8 @@ class Sequencer(object):
             channel = note.channel
         self.stop_event(int(note) + 12, int(channel))
         self.notify_listeners(
-            self.MSG_STOP_INT, {"channel": int(channel), "note": int(note) + 12}
+            self.MSG_STOP_INT, {"channel": int(
+                channel), "note": int(note) + 12}
         )
         self.notify_listeners(
             self.MSG_STOP_NOTE, {"channel": int(channel), "note": note}
@@ -196,7 +209,8 @@ class Sequencer(object):
     def play_NoteContainer(self, nc, channel=1, velocity=100):
         """Play the Notes in the NoteContainer nc."""
         self.notify_listeners(
-            self.MSG_PLAY_NC, {"notes": nc, "channel": channel, "velocity": velocity}
+            self.MSG_PLAY_NC, {"notes": nc,
+                               "channel": channel, "velocity": velocity}
         )
         if nc is None:
             return True
@@ -207,7 +221,8 @@ class Sequencer(object):
 
     def stop_NoteContainer(self, nc, channel=1):
         """Stop playing the notes in NoteContainer nc."""
-        self.notify_listeners(self.MSG_STOP_NC, {"notes": nc, "channel": channel})
+        self.notify_listeners(
+            self.MSG_STOP_NC, {"notes": nc, "channel": channel})
         if nc is None:
             return True
         for note in nc:
@@ -252,7 +267,8 @@ class Sequencer(object):
         by providing one or more of the NoteContainers with a bpm argument.
         """
         self.notify_listeners(
-            self.MSG_PLAY_BARS, {"bars": bars, "channels": channels, "bpm": bpm}
+            self.MSG_PLAY_BARS, {"bars": bars,
+                                 "channels": channels, "bpm": bpm}
         )
         qn_length = 60.0 / bpm  # length of a quarter note
         tick = 0.0  # place in beat from 0.0 to bar.length
@@ -268,7 +284,7 @@ class Sequencer(object):
             for (n, x) in enumerate(cur):
                 (start_tick, note_length, nc) = bars[n][x]
                 if start_tick <= tick:
-                    if isinstance(velocity,int):
+                    if isinstance(velocity, int):
                         velocity_n = velocity
                     else:
                         velocity_n = velocity[n]
@@ -329,7 +345,8 @@ class Sequencer(object):
 
     def play_Track(self, track, channel=1, bpm=120, velocity=100):
         """Play a Track object."""
-        self.notify_listeners(self.MSG_PLAY_TRACK, {"track": track, "channel": channel, "bpm": bpm})
+        self.notify_listeners(self.MSG_PLAY_TRACK, {
+                              "track": track, "channel": channel, "bpm": bpm})
         instr = track.instrument
         if instr is not None:
             self.set_instrument(channel, instr)
@@ -348,13 +365,14 @@ class Sequencer(object):
         set automatically.
         """
         self.notify_listeners(
-            self.MSG_PLAY_TRACKS, {"tracks": tracks, "channels": channels, "bpm": bpm}
+            self.MSG_PLAY_TRACKS, {"tracks": tracks,
+                                   "channels": channels, "bpm": bpm}
         )
 
         # Set the right instruments
         max_bar = 0
         for x in range(len(tracks)):
-            max_bar = max(max_bar,len(tracks[0]))
+            max_bar = max(max_bar, len(tracks[0]))
             instr = tracks[x].instrument
             if instr is not None:
                 self.set_instrument(channels[x], instr)
@@ -364,7 +382,7 @@ class Sequencer(object):
         while current_bar < max_bar:
             playbars = []
             for tr in tracks:
-                if current_bar<len(tr):
+                if current_bar < len(tr):
                     playbars.append(tr[current_bar])
             res = self.play_Bars(playbars, channels, bpm, velocity)
             if res != {}:

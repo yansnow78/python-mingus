@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
+from enum import Enum, auto
 
 #    mingus - Music theory Python package, instrument module.
 #    Copyright (C) 2008-2009, Bart Spaans
@@ -54,7 +55,8 @@ class Instrument(object):
             range[1] = Note(range[1])
         if not hasattr(range[0], "name"):
             raise UnexpectedObjectError(
-                "Unexpected object '%s'. " "Expecting a mingus.containers.Note object" % range[0]
+                "Unexpected object '%s'. " "Expecting a mingus.containers.Note object" % range[
+                    0]
             )
         self.range = range
 
@@ -120,141 +122,157 @@ class Guitar(Instrument):
         return Instrument.can_play_notes(self, notes)
 
 
+class MidiInstr(Enum):
+    ACOUSTIC_GRAND_PIANO = 0
+    BRIGHT_ACOUSTIC_PIANO = auto()
+    ELECTRIC_GRAND_PIANO = auto()
+    HONKY_TONK_PIANO = auto()
+    ELECTRIC_PIANO_1 = auto()
+    ELECTRIC_PIANO_2 = auto()
+    HARPSICHORD = auto()
+    CLAVI = auto()
+
+    CELESTA = auto()
+    GLOCKENSPIEL = auto()
+    MUSIC_BOX = auto()
+    VIBRAPHONE = auto()
+    MARIMBA = auto()
+    XYLOPHONE = auto()
+    TUBULAR_BELLS = auto()
+    DULCIMER = auto()
+
+    DRAWBAR_ORGAN = auto()
+    PERCUSSIVE_ORGAN = auto()
+    ROCK_ORGAN = auto()
+    CHURCH_ORGAN = auto()
+    REED_ORGAN = auto()
+    ACCORDION = auto()
+    HARMONICA = auto()
+    TANGO_ACCORDION = auto()
+
+    ACOUSTIC_GUITAR_NYLON = auto()
+    ACOUSTIC_GUITAR_STEEL = auto()
+    ELECTRIC_GUITAR_JAZZ = auto()
+    ELECTRIC_GUITAR_CLEAN = auto()
+    ELECTRIC_GUITAR_MUTED = auto()
+    OVERDRIVEN_GUITAR = auto()
+    DISTORTION_GUITAR = auto()
+    GUITAR_HARMONICS = auto()
+
+    ACOUSTIC_BASS = auto()
+    ELECTRIC_BASS_FINGER = auto()
+    ELECTRIC_BASS_PICK = auto()
+    FRETLESS_BASS = auto()
+    SLAP_BASS_1 = auto()
+    SLAP_BASS_2 = auto()
+    SYNTH_BASS_1 = auto()
+    SYNTH_BASS_2 = auto()
+
+    VIOLIN = auto()
+    VIOLA = auto()
+    CELLO = auto()
+    CONTRABASS = auto()
+    TREMOLO_STRINGS = auto()
+    PIZZICATO_STRINGS = auto()
+    ORCHESTRAL_HARP = auto()
+    TIMPANI = auto()
+
+    STRING_ENSEMBLE_1 = auto()
+    STRING_ENSEMBLE_2 = auto()
+    SYNTHSTRINGS_1 = auto()
+    SYNTHSTRINGS_2 = auto()
+    CHOIR_AAHS = auto()
+    VOICE_OOHS = auto()
+    SYNTH_VOICE = auto()
+    ORCHESTRA_HIT = auto()
+
+    TRUMPET = auto()
+    TROMBONE = auto()
+    TUBA = auto()
+    MUTED_TRUMPET = auto()
+    FRENCH_HORN = auto()
+    BRASS_SECTION = auto()
+    SYNTHBRASS_1 = auto()
+    SYNTHBRASS_2 = auto()
+
+    SOPRANO_SAX = auto()
+    ALTO_SAX = auto()
+    TENOR_SAX = auto()
+    BARITONE_SAX = auto()
+    OBOE = auto()
+    ENGLISH_HORN = auto()
+    BASSOON = auto()
+    CLARINET = auto()
+
+    PICCOLO = auto()
+    FLUTE = auto()
+    RECORDER = auto()
+    PAN_FLUTE = auto()
+    BLOWN_BOTTLE = auto()
+    SHAKUHACHI = auto()
+    WHISTLE = auto()
+    OCARINA = auto()
+
+    LEAD_1_SQUARE = auto()
+    LEAD_2_SAWTOOTH = auto()
+    LEAD_3_CALLIOPE = auto()
+    LEAD_4_CHIFF = auto()
+    LEAD_5_CHARANG = auto()
+    LEAD_6_VOICE = auto()
+    LEAD_7_FIFTHS = auto()
+    LEAD_8_BASS_LEAD = auto()
+
+    PAD_1_NEW_AGE = auto()
+    PAD_2_WARM = auto()
+    PAD_3_POLYSYNTH = auto()
+    PAD_4_CHOIR = auto()
+    PAD_5_BOWED = auto()
+    PAD_6_METALLIC = auto()
+    PAD_7_HALO = auto()
+    PAD_8_SWEEP = auto()
+
+    FX_1_RAIN = auto()
+    FX_2_SOUNDTRACK = auto()
+    FX_3_CRYSTAL = auto()
+    FX_4_ATMOSPHERE = auto()
+    FX_5_BRIGHTNESS = auto()
+    FX_6_GOBLINS = auto()
+    FX_7_ECHOES = auto()
+    FX_8_SCI_FI = auto()
+
+    SITAR = auto()
+    BANJO = auto()
+    SHAMISEN = auto()
+    KOTO = auto()
+    KALIMBA = auto()
+    BAG_PIPE = auto()
+    FIDDLE = auto()
+    SHANAI = auto()
+
+    TINKLE_BELL = auto()
+    AGOGO = auto()
+    STEEL_DRUMS = auto()
+    WOODBLOCK = auto()
+    TAIKO_DRUM = auto()
+    MELODIC_TOM = auto()
+    SYNTH_DRUM = auto()
+    REVERSE_CYMBAL = auto()
+
+    GUITAR_FRET_NOISE = auto()
+    BREATH_NOISE = auto()
+    SEASHORE = auto()
+    BIRD_TWEET = auto()
+    TELEPHONE_RING = auto()
+    HELICOPTER = auto()
+    APPLAUSE = auto()
+    GUNSHOT = auto()
+
+
 class MidiInstrument(Instrument):
 
     range = (Note("C", 0), Note("B", 8))
     instrument_nr = 1
     name = ""
-    names = [
-        "Acoustic Grand Piano",
-        "Bright Acoustic Piano",
-        "Electric Grand Piano",
-        "Honky-tonk Piano",
-        "Electric Piano 1",
-        "Electric Piano 2",
-        "Harpsichord",
-        "Clavi",
-        "Celesta",
-        "Glockenspiel",
-        "Music Box",
-        "Vibraphone",
-        "Marimba",
-        "Xylophone",
-        "Tubular Bells",
-        "Dulcimer",
-        "Drawbar Organ",
-        "Percussive Organ",
-        "Rock Organ",
-        "Church Organ",
-        "Reed Organ",
-        "Accordion",
-        "Harmonica",
-        "Tango Accordion",
-        "Acoustic Guitar (nylon)",
-        "Acoustic Guitar (steel)",
-        "Electric Guitar (jazz)",
-        "Electric Guitar (clean)",
-        "Electric Guitar (muted)",
-        "Overdriven Guitar",
-        "Distortion Guitar",
-        "Guitar harmonics",
-        "Acoustic Bass",
-        "Electric Bass (finger)",
-        "Electric Bass (pick)",
-        "Fretless Bass",
-        "Slap Bass 1",
-        "Slap Bass 2",
-        "Synth Bass 1",
-        "Synth Bass 2",
-        "Violin",
-        "Viola",
-        "Cello",
-        "Contrabass",
-        "Tremolo Strings",
-        "Pizzicato Strings",
-        "Orchestral Harp",
-        "Timpani",
-        "String Ensemble 1",
-        "String Ensemble 2",
-        "SynthStrings 1",
-        "SynthStrings 2",
-        "Choir Aahs",
-        "Voice Oohs",
-        "Synth Voice",
-        "Orchestra Hit",
-        "Trumpet",
-        "Trombone",
-        "Tuba",
-        "Muted Trumpet",
-        "French Horn",
-        "Brass Section",
-        "SynthBrass 1",
-        "SynthBrass 2",
-        "Soprano Sax",
-        "Alto Sax",
-        "Tenor Sax",
-        "Baritone Sax",
-        "Oboe",
-        "English Horn",
-        "Bassoon",
-        "Clarinet",
-        "Piccolo",
-        "Flute",
-        "Recorder",
-        "Pan Flute",
-        "Blown Bottle",
-        "Shakuhachi",
-        "Whistle",
-        "Ocarina",
-        "Lead1 (square)",
-        "Lead2 (sawtooth)",
-        "Lead3 (calliope)",
-        "Lead4 (chiff)",
-        "Lead5 (charang)",
-        "Lead6 (voice)",
-        "Lead7 (fifths)",
-        "Lead8 (bass + lead)",
-        "Pad1 (new age)",
-        "Pad2 (warm)",
-        "Pad3 (polysynth)",
-        "Pad4 (choir)",
-        "Pad5 (bowed)",
-        "Pad6 (metallic)",
-        "Pad7 (halo)",
-        "Pad8 (sweep)",
-        "FX1 (rain)",
-        "FX2 (soundtrack)",
-        "FX 3 (crystal)",
-        "FX 4 (atmosphere)",
-        "FX 5 (brightness)",
-        "FX 6 (goblins)",
-        "FX 7 (echoes)",
-        "FX 8 (sci-fi)",
-        "Sitar",
-        "Banjo",
-        "Shamisen",
-        "Koto",
-        "Kalimba",
-        "Bag pipe",
-        "Fiddle",
-        "Shanai",
-        "Tinkle Bell",
-        "Agogo",
-        "Steel Drums",
-        "Woodblock",
-        "Taiko Drum",
-        "Melodic Tom",
-        "Synth Drum",
-        "Reverse Cymbal",
-        "Guitar Fret Noise",
-        "Breath Noise",
-        "Seashore",
-        "Bird Tweet",
-        "Telephone Ring",
-        "Helicopter",
-        "Applause",
-        "Gunshot",
-    ]
 
     def __init__(self, name=""):
         self.name = name
