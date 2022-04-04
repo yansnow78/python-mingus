@@ -118,6 +118,8 @@ class Sequencer(object):
             instr_i = instr.instrument_nr
         elif isinstance(instr, six.string_types):
             instr_name = instr
+        elif isinstance(instr, MidiInstr):
+            instr_name = instr
         if instr_name:
             if isinstance(instr_name, MidiInstr):
                 instr_i = instr_name.value

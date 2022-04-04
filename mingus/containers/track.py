@@ -24,7 +24,7 @@ from mingus.containers.bar import Bar
 import mingus.core.value as value
 import six
 from six.moves import range
-
+from typing import Sequence
 
 class Track(object):
 
@@ -171,6 +171,14 @@ class Track(object):
             bar.diminish()
         return self
 
+    def __iadd__(self, value):
+        """Enable the '+=' operator for Tracks.
+
+        Notes, notes as string, NoteContainers, Bars, and Sequence are accepted.        
+        """
+        self.__add__(value)
+        return self
+        
     def __add__(self, value):
         """Enable the '+' operator for Tracks.
 
@@ -182,6 +190,10 @@ class Track(object):
             return self.add_notes(value)
         elif hasattr(value, "name") or isinstance(value, six.string_types):
             return self.add_notes(value)
+        elif isinstance(value, Sequence):
+            for el in value:
+                self.__add__(el)
+            return self
 
     def test_integrity(self):
         """Test whether all but the last Bars contained in this track are
