@@ -194,7 +194,7 @@ class Track(object):
         elif hasattr(value, "name") or isinstance(value, six.string_types):
             return self.add_notes(value)
         elif isinstance(value, tuple):
-            return self.add_notes(value[0],value[1])
+            return self.add_notes(value[0], value[1])
         elif isinstance(value, Sequence):
             for el in value:
                 self.__add__(el)
