@@ -209,7 +209,8 @@ class Bar(object):
             res.append(
                 [
                     x[0],
-                    progressions.determine(x[2].get_note_names(), self.key.key, shorthand),
+                    progressions.determine(
+                        x[2].get_note_names(), self.key.key, shorthand),
                 ]
             )
         return res
@@ -223,12 +224,23 @@ class Bar(object):
                     res.append(x)
         return res
 
-    def __add__(self, note_container):
+    def __iadd__(self, value):
+        """Enable the '+=' operator on Bars."""
+        self.__add__(value)
+        return self
+
+    def __add__(self, value):
         """Enable the '+' operator on Bars."""
-        if self.meter[1] != 0:
-            return self.place_notes(note_container, self.meter[1])
+        if isinstance(value, tuple):
+            note_container = value[0]
+            duration = value[1]
         else:
-            return self.place_notes(note_container, 4)
+            note_container = value
+            if self.meter[1] != 0:
+                duration = self.meter[1]
+            else:
+                duration = 4
+        return self.place_notes(note_container, duration)
 
     def __getitem__(self, index):
         """Enable the  '[]' notation on Bars to get the item at the index."""
