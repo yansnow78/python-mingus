@@ -87,7 +87,7 @@ def to_bars(notes_str: str, container: Track | Bar | list[Bar],
             note.octave += 1
         elif x == ",":
             note.octave -= 1
-        elif x in [" ", ""]== " " or x == "|":
+        elif x in [" ", "|"]:
             pass
         elif x.isdigit() or (x == '/'):
             # if duration_str == "":
