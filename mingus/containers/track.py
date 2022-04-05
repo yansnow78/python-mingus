@@ -21,6 +21,7 @@ from __future__ import absolute_import
 from mingus.containers.mt_exceptions import InstrumentRangeError, UnexpectedObjectError
 from mingus.containers.note_container import NoteContainer
 from mingus.containers.bar import Bar
+from mingus.containers.instrument import Instrument
 import mingus.core.value as value
 import six
 from six.moves import range
@@ -64,7 +65,7 @@ class Track(object):
         attached to the Track, but the note turns out not to be within the
         range of the Instrument.
         """
-        if self.instrument != None:
+        if note and isinstance(self.instrument, Instrument):
             if not self.instrument.can_play_notes(note):
                 raise InstrumentRangeError(
                     "Note '%s' is not in range of the instrument (%s)" % (note, self.instrument)
@@ -135,7 +136,7 @@ class Track(object):
         If an instrument is set and has a tuning it will be returned.
         Otherwise the track's one will be used.
         """
-        if self.instrument and self.instrument.tuning:
+        if isinstance(self.instrument, Instrument) and self.instrument.tuning:
             return self.instrument.tuning
         return self.tuning
 
@@ -145,7 +146,7 @@ class Track(object):
 
         Tuning should be a StringTuning or derivative object.
         """
-        if self.instrument:
+        if isinstance(self.instrument, Instrument):
             self.instrument.tuning = tuning
         self.tuning = tuning
         return self
@@ -182,14 +183,18 @@ class Track(object):
     def __add__(self, value):
         """Enable the '+' operator for Tracks.
 
-        Notes, notes as string, NoteContainers and Bars accepted.
+        Notes, notes as string, tuple(string, int), NoteContainers and Bars accepted.
         """
+        if value is None:
+            return self.add_notes(None)
         if hasattr(value, "bar"):
             return self.add_bar(value)
         elif hasattr(value, "notes"):
             return self.add_notes(value)
         elif hasattr(value, "name") or isinstance(value, six.string_types):
             return self.add_notes(value)
+        elif isinstance(value, tuple):
+            return self.add_notes(value[0],value[1])
         elif isinstance(value, Sequence):
             for el in value:
                 self.__add__(el)
