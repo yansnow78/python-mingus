@@ -28,7 +28,8 @@ attached to the Sequencer.
 """
 from __future__ import absolute_import
 
-from mingus.containers.instrument import MidiInstrument, MidiInstr
+from mingus.containers.instrument import MidiInstrument, MidiInstr, MidiPercuInstr
+from mingus.containers.percussion_note import PercussionNote
 from six.moves import range
 import six
 
@@ -170,12 +171,20 @@ class Sequencer(object):
                 velocity = note.velocity
             if "channel" in note.__dict__:
                 channel = note.channel
-        self.play_event(int(note) + 12, int(channel), int(velocity))
+
+        if isinstance(note, PercussionNote):
+            note_i = note.key_number
+        if isinstance(note, MidiPercuInstr):
+            note_i = note.value
+        else:
+            note_i = int(note) + 12
+
+        self.play_event(note_i, int(channel), int(velocity))
         self.notify_listeners(
             self.MSG_PLAY_INT,
             {
                 "channel": int(channel),
-                "note": int(note) + 12,
+                "note": note_i,
                 "velocity": int(velocity),
             },
         )
@@ -193,10 +202,16 @@ class Sequencer(object):
         """
         if hasattr(note, '__dict__') and "channel" in note.__dict__:
             channel = note.channel
-        self.stop_event(int(note) + 12, int(channel))
+        if isinstance(note, PercussionNote):
+            note_i = note.key_number
+        if isinstance(note, MidiPercuInstr):
+            note_i = note.value
+        else:
+            note_i = int(note) + 12
+        self.stop_event(note_i, int(channel))
         self.notify_listeners(
             self.MSG_STOP_INT, {"channel": int(
-                channel), "note": int(note) + 12}
+                channel), "note": note_i}
         )
         self.notify_listeners(
             self.MSG_STOP_NOTE, {"channel": int(channel), "note": note}
