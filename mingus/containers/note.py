@@ -75,7 +75,8 @@ class Note(object):
         elif isinstance(name, int):
             self.from_int(name)
         else:
-            raise NoteFormatError("Don't know what to do with name object: %r" % name)
+            raise NoteFormatError(
+                "Don't know what to do with name object: %r" % name)
 
     @property
     def dynamics(self):

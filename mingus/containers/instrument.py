@@ -278,59 +278,60 @@ class MidiInstrument(Instrument):
         self.name = name
 
 
+class MidiPercuInstr(Enum):
+    ACOUSTIC_BASS_DRUM = 35
+    BASS_DRUM_1 = 36
+    SIDE_STICK = 37
+    ACOUSTIC_SNARE = 38
+    HAND_CLAP = 39
+    ELECTRIC_SNARE = 40
+    LOW_FLOOR_TOM = 41
+    CLOSED_HI_HAT = 42
+    HIGH_FLOOR_TOM = 43
+    PEDAL_HI_HAT = 44
+    LOW_TOM = 45
+    OPEN_HI_HAT = 46
+    LOW_MID_TOM = 47
+    HI_MID_TOM = 48
+    CRASH_CYMBAL_1 = 49
+    HIGH_TOM = 50
+    RIDE_CYMBAL_1 = 51
+    CHINESE_CYMBAL = 52
+    RIDE_BELL = 53
+    TAMBOURINE = 54
+    SPLASH_CYMBAL = 55
+    COWBELL = 56
+    CRASH_CYMBAL_2 = 57
+    VIBRASLAP = 58
+    RIDE_CYMBAL_2 = 59
+    HI_BONGO = 60
+    LOW_BONGO = 61
+    MUTE_HI_CONGA = 62
+    OPEN_HI_CONGA = 63
+    LOW_CONGA = 64
+    HIGH_TIMBALE = 65
+    LOW_TIMBALE = 66
+    HIGH_AGOGO = 67
+    LOW_AGOGO = 68
+    CABASA = 69
+    MARACAS = 70
+    SHORT_WHISTLE = 71
+    LONG_WHISTLE = 72
+    SHORT_GUIRO = 73
+    LONG_GUIRO = 74
+    CLAVES = 75
+    HI_WOOD_BLOCK = 76
+    LOW_WOOD_BLOCK = 77
+    MUTE_CUICA = 78
+    OPEN_CUICA = 79
+    MUTE_TRIANGLE = 80
+    OPEN_TRIANGLE = 81
+
+
 class MidiPercussionInstrument(Instrument):
     def __init__(self):
         super(MidiPercussionInstrument, self).__init__()
         self.name = "Midi Percussion"
-        self.mapping = {
-            35: "Acoustic Bass Drum",
-            36: "Bass Drum 1",
-            37: "Side Stick",
-            38: "Acoustic Snare",
-            39: "Hand Clap",
-            40: "Electric Snare",
-            41: "Low Floor Tom",
-            42: "Closed Hi Hat",
-            43: "High Floor Tom",
-            44: "Pedal Hi-Hat",
-            45: "Low Tom",
-            46: "Open Hi-Hat",
-            47: "Low-Mid Tom",
-            48: "Hi Mid Tom",
-            49: "Crash Cymbal 1",
-            50: "High Tom",
-            51: "Ride Cymbal 1",
-            52: "Chinese Cymbal",
-            53: "Ride Bell",
-            54: "Tambourine",
-            55: "Splash Cymbal",
-            56: "Cowbell",
-            57: "Crash Cymbal 2",
-            58: "Vibraslap",
-            59: "Ride Cymbal 2",
-            60: "Hi Bongo",
-            61: "Low Bongo",
-            62: "Mute Hi Conga",
-            63: "Open Hi Conga",
-            64: "Low Conga",
-            65: "High Timbale",
-            66: "Low Timbale",
-            67: "High Agogo",
-            68: "Low Agogo",
-            69: "Cabasa",
-            70: "Maracas",
-            71: "Short Whistle",
-            72: "Long Whistle",
-            73: "Short Guiro",
-            74: "Long Guiro",
-            75: "Claves",
-            76: "Hi Wood Block",
-            77: "Low Wood Block",
-            78: "Mute Cuica",
-            79: "Open Cuica",
-            80: "Mute Triangle",
-            81: "Open Triangle",
-        }
 
     def acoustic_bass_drum(self):
         return Note(35 - 12)
