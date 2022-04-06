@@ -128,9 +128,9 @@ def init(sf2, driver=None, file=None):
             midi.start_recording(file)
         else:
             midi.start_audio_output(driver)
-        if sf2 and not midi.load_sound_font(sf2):
+        if not midi.load_sound_font(sf2):
             return False
-        # midi.fs.program_reset()
+        midi.fs.program_reset()
         initialized = True
     return True
 
