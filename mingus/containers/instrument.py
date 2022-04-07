@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
-from enum import Enum, auto
+from __future__ import absolute_import, annotations
+from enum import IntEnum
 
 #    mingus - Music theory Python package, instrument module.
 #    Copyright (C) 2008-2009, Bart Spaans
@@ -122,7 +122,7 @@ class Guitar(Instrument):
         return Instrument.can_play_notes(self, notes)
 
 
-class MidiInstr(Enum):
+class MidiInstr(IntEnum):
     ACOUSTIC_GRAND_PIANO = 0
     BRIGHT_ACOUSTIC_PIANO = 1
     ELECTRIC_GRAND_PIANO = 2
@@ -271,14 +271,47 @@ class MidiInstr(Enum):
 class MidiInstrument(Instrument):
 
     range = (Note("C", 0), Note("B", 8))
-    instrument_nr = 1
     name = ""
 
-    def __init__(self, name=""):
+    def __init__(self, name: str = "", instrument_nr: int = None):
         self.name = name
+        self.instrument_nr = instrument_nr
+        
+    @property
+    def instrument_nr(self):
+        if not self._instrument_nr and self._name:
+            instr_name = self._name.replace(" ", "_")
+            instr_name = instr_name.replace("(", "")
+            instr_name = instr_name.replace(")", "")
+            instr_name = instr_name.upper()
+            try:
+                self._instrument_nr = MidiInstr[instr_name].value
+            except Exception:
+                pass
+        if self._instrument_nr:
+            return self._instrument_nr
+        else:
+            return 1
+    
+    @instrument_nr.setter
+    def instrument_nr(self, value: int | MidiInstr):
+        self._instrument_nr = value
+        if isinstance(value, MidiInstr) and not self._name:
+            self._name = value.name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        self._name = value
+
+    def __int__(self):
+        return int(self.instrument_nr)
 
 
-class MidiPercuInstr(Enum):
+class MidiPercuInstr(IntEnum):
     ACOUSTIC_BASS_DRUM = 35
     BASS_DRUM_1 = 36
     SIDE_STICK = 37

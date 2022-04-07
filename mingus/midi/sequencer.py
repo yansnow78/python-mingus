@@ -112,34 +112,15 @@ class Sequencer(object):
 
     def set_instrument(self, channel, instr, bank=0):
         """Set the channel to the instrument _instr_."""
-        instr_name = ""
-        instr_i = 1
-        if isinstance(instr, MidiInstrument):
-            instr_name = instr.name
-            instr_i = instr.instrument_nr
-        elif isinstance(instr, six.string_types):
-            instr_name = instr
-        elif isinstance(instr, MidiInstr):
-            instr_name = instr
-        if instr_name:
-            if isinstance(instr_name, MidiInstr):
-                instr_i = instr_name.value
-            else:
-                try:
-                    instr_name = instr_name.replace(" ", "_")
-                    instr_name = instr_name.replace("(", "")
-                    instr_name = instr_name.replace(")", "")
-                    instr_name = instr_name.upper()
-                    instr_i = MidiInstr[instr_name].value
-                except ValueError:
-                    instr_i = 1
-        elif isinstance(instr, int):
-            instr_i = instr
+        if isinstance(instr, six.string_types):
+            instr = MidiInstrument(instr)
+        instr_i = int(instr)
+
         self.instr_event(channel, instr_i, bank)
         self.notify_listeners(
             self.MSG_INSTR,
-            {"channel": int(channel), "instr": int(
-                instr_i), "bank": int(bank)},
+            {"channel": int(channel), "instr":
+                instr_i, "bank": int(bank)},
         )
 
     def control_change(self, channel, control, value):
