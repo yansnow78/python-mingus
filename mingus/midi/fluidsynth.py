@@ -84,16 +84,16 @@ class FluidSynthSequencer(Sequencer):
 
     # Implement Sequencer's interface
     def play_event(self, note, channel, velocity):
-        self.fs.noteon(channel, note, velocity)
+        return self.fs.noteon(channel, note, velocity)
 
     def stop_event(self, note, channel):
-        self.fs.noteoff(channel, note)
+        return self.fs.noteoff(channel, note)
 
     def cc_event(self, channel, control, value):
-        self.fs.cc(channel, control, value)
+        return self.fs.cc(channel, control, value)
 
     def instr_event(self, channel, instr, bank):
-        self.fs.program_select(channel, self.sfid, bank, instr)
+        return self.fs.program_select(channel, self.sfid, bank, instr)
 
     def sleep(self, seconds):
         if hasattr(self, "wav"):
